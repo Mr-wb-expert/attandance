@@ -10,6 +10,56 @@ let subjects = [];
 let attendanceRecords = [];
 let activities = [];
 
+const DEFAULT_STUDENTS = [
+    {rollNo: "100039", name: "Ayesha Jamshed"},
+    {rollNo: "100040", name: "Ali Hassan"},
+    {rollNo: "100041", name: "Mubeen Tariq"},
+    {rollNo: "100042", name: "Ayesha Bibi"},
+    {rollNo: "100043", name: "Amna Gull"},
+    {rollNo: "100044", name: "Ali Raza"},
+    {rollNo: "100045", name: "M-Usman"},
+    {rollNo: "100046", name: "Awais Qurni"},
+    {rollNo: "100048", name: "Ayesha Saleem"},
+    {rollNo: "100049", name: "Iman Zahid"},
+    {rollNo: "100050", name: "Adeela Naz"},
+    {rollNo: "100051", name: "Nida Imran"},
+    {rollNo: "100052", name: "Zain-ul-Abdin"},
+    {rollNo: "100053", name: "Muskan Tahir"},
+    {rollNo: "100054", name: "Mouzan Raza"},
+    {rollNo: "100055", name: "M-Arslan"},
+    {rollNo: "100056", name: "Rabiha"},
+    {rollNo: "100057", name: "M-Burhan"},
+    {rollNo: "100058", name: "Humara Aziz"},
+    {rollNo: "100060", name: "Abdul Rehman"},
+    {rollNo: "100061", name: "Aleeha Malik"},
+    {rollNo: "100064", name: "Tooba Rafique"},
+    {rollNo: "100067", name: "M.Qasim"},
+    {rollNo: "100069", name: "Rubina Bibi"},
+    {rollNo: "100070", name: "M. Bilal"},
+    {rollNo: "100071", name: "Umair-ul-Hasan"},
+    {rollNo: "100072", name: "Qayoom Ali"},
+    {rollNo: "100073", name: "Javeria"},
+    {rollNo: "100074", name: "Umara"},
+    {rollNo: "100075", name: "Rabia"},
+    {rollNo: "100076", name: "M. Hussnain"},
+    {rollNo: "100078", name: "Asad Qurban"},
+    {rollNo: "100079", name: "Behzad"},
+    {rollNo: "100081", name: "Nimra Kanwal"},
+    {rollNo: "100083", name: "Malika"},
+    {rollNo: "112649", name: "Ayesha"},
+    {rollNo: "112650", name: "Mamoonah"},
+    {rollNo: "112651", name: "Subhan"}
+];
+
+const DEFAULT_SUBJECTS = [
+    {name: "Artificial Intelligence"},
+    {name: "Cyber Security"},
+    {name: "Compiler Construction"},
+    {name: "Numerical Computing"},
+    {name: "Parallel and Distributed Computing"},
+    {name: "Web Engineering"}
+];
+
 function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
@@ -19,6 +69,23 @@ function loadData() {
     subjects = JSON.parse(localStorage.getItem(STORAGE_KEYS.SUBJECTS)) || [];
     attendanceRecords = JSON.parse(localStorage.getItem(STORAGE_KEYS.ATTENDANCE)) || [];
     activities = JSON.parse(localStorage.getItem(STORAGE_KEYS.ACTIVITY)) || [];
+    
+    if (students.length === 0) {
+        students = DEFAULT_STUDENTS.map((s, i) => ({
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2) + i,
+            rollNo: s.rollNo,
+            name: s.name
+        }));
+        saveData();
+    }
+    
+    if (subjects.length === 0) {
+        subjects = DEFAULT_SUBJECTS.map((s, i) => ({
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2) + i,
+            name: s.name
+        }));
+        saveData();
+    }
 }
 
 function saveData() {
@@ -788,11 +855,19 @@ function doResetData() {
     localStorage.removeItem(STORAGE_KEYS.SUBJECTS);
     localStorage.removeItem(STORAGE_KEYS.ATTENDANCE);
     localStorage.removeItem(STORAGE_KEYS.ACTIVITY);
-    students = [];
-    subjects = [];
+    students = DEFAULT_STUDENTS.map((s, i) => ({
+        id: Date.now().toString(36) + Math.random().toString(36).substr(2) + i,
+        rollNo: s.rollNo,
+        name: s.name
+    }));
+    subjects = DEFAULT_SUBJECTS.map((s, i) => ({
+        id: Date.now().toString(36) + Math.random().toString(36).substr(2) + i,
+        name: s.name
+    }));
     attendanceRecords = [];
     activities = [];
-    showToast('All data has been reset');
+    saveData();
+    showToast('Database reset with default data');
     renderDashboard();
     renderStudents();
     renderSubjects();
