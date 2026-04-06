@@ -823,6 +823,39 @@ function clearActivityLog() {
 }
 
 function resetAllData() {
+    document.getElementById('modal-title').textContent = 'Password Required';
+    document.getElementById('modal-body').innerHTML = `
+        <div class="confirm-box">
+            <div class="confirm-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h3>Enter Password to Reset</h3>
+            <p class="confirm-details">Please enter the admin password to reset the database.</p>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="reset-password" placeholder="Enter password" onkeydown="if(event.key==='Enter')verifyResetPassword()">
+            </div>
+        </div>
+    `;
+    document.getElementById('modal-footer').innerHTML = `
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-danger" onclick="verifyResetPassword()">
+            <i class="fas fa-key"></i> Verify
+        </button>
+    `;
+    openModal();
+    setTimeout(() => document.getElementById('reset-password')?.focus(), 100);
+}
+
+function verifyResetPassword() {
+    const password = document.getElementById('reset-password').value;
+    if (password !== 'Raza@17582') {
+        showToast('Incorrect password! Access denied.', 'error');
+        document.getElementById('reset-password').value = '';
+        document.getElementById('reset-password').focus();
+        return;
+    }
+    
     document.getElementById('modal-title').textContent = 'Reset Database';
     document.getElementById('modal-body').innerHTML = `
         <div class="confirm-box">
@@ -846,7 +879,6 @@ function resetAllData() {
             <i class="fas fa-trash"></i> Reset Everything
         </button>
     `;
-    openModal();
 }
 
 function doResetData() {
