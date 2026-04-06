@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Attendance Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="mobile-header">
+            <div class="mobile-logo">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Attendance</span>
+            </div>
+        </header>
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Attendance</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#dashboard" class="nav-item active" data-view="dashboard">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#students" class="nav-item" data-view="students">
+                    <i class="fas fa-users"></i>
+                    <span>Students</span>
+                </a>
+                <a href="#subjects" class="nav-item" data-view="subjects">
+                    <i class="fas fa-book"></i>
+                    <span>Subjects</span>
+                </a>
+                <a href="#attendance" class="nav-item" data-view="attendance">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Mark Attendance</span>
+                </a>
+                <a href="#history" class="nav-item" data-view="history">
+                    <i class="fas fa-history"></i>
+                    <span>History</span>
+                </a>
+                <a href="#export" class="nav-item" data-view="export">
+                    <i class="fas fa-file-export"></i>
+                    <span>Export</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div id="dashboard-view" class="view active">
+                <h1>Dashboard</h1>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="total-students">0</h3>
+                            <p>Total Students</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="total-subjects">0</h3>
+                            <p>Subjects</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="today-attendance">-</h3>
+                            <p>Today's Attendance</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="recent-activity">
+                    <div class="activity-header">
+                        <h2>Recent Activity</h2>
+                        <button class="btn btn-secondary btn-small" onclick="clearActivityLog()">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
+                    </div>
+                    <div id="activity-list" class="activity-list">
+                        <p class="no-activity">No recent activity</p>
+                    </div>
+                </div>
+                <div class="dashboard-actions">
+                    <button class="btn btn-danger" onclick="resetAllData()">
+                        <i class="fas fa-database"></i> Reset Database
+                    </button>
+                </div>
+            </div>
+
+            <div id="students-view" class="view">
+                <h1>Manage Students</h1>
+                <div class="view-actions">
+                    <button class="btn btn-primary" onclick="showAddStudentModal()">
+                        <i class="fas fa-plus"></i> Add Student
+                    </button>
+                    <button class="btn btn-secondary" onclick="showBulkAddModal()">
+                        <i class="fas fa-list"></i> Bulk Add
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-table-body">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="students-empty" class="empty-state">
+                    <i class="fas fa-user-graduate"></i>
+                    <h3>No Students Yet</h3>
+                    <p>Add students to start marking attendance</p>
+                </div>
+            </div>
+
+            <div id="subjects-view" class="view">
+                <h1>Manage Subjects</h1>
+                <div class="view-actions">
+                    <button class="btn btn-primary" onclick="showAddSubjectModal()">
+                        <i class="fas fa-plus"></i> Add Subject
+                    </button>
+                </div>
+                <div class="subjects-grid" id="subjects-list">
+                </div>
+                <div id="subjects-empty" class="empty-state">
+                    <i class="fas fa-book-open"></i>
+                    <h3>No Subjects Yet</h3>
+                    <p>Add subjects to start marking attendance</p>
+                </div>
+            </div>
+
+            <div id="attendance-view" class="view">
+                <h1>Mark Attendance</h1>
+                <div class="attendance-controls">
+                    <div class="control-group">
+                        <label>Subject</label>
+                        <select id="attendance-subject" onchange="loadAttendanceForDate()">
+                            <option value="">Select Subject</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Date</label>
+                        <input type="date" id="attendance-date" onchange="loadAttendanceForDate()">
+                    </div>
+                    <button class="btn btn-secondary" onclick="goToToday()">
+                        <i class="fas fa-calendar-day"></i> Today
+                    </button>
+                    <button class="btn btn-success" id="mark-all-present" onclick="markAllPresent()" disabled>
+                        <i class="fas fa-check-double"></i> Mark All Present
+                    </button>
+                </div>
+                <div id="attendance-list" class="attendance-list">
+                </div>
+                <div id="attendance-empty" class="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>Select Subject & Date</h3>
+                    <p>Choose a subject and date to mark attendance</p>
+                </div>
+                <button class="btn btn-primary btn-save" id="save-attendance" onclick="confirmSaveAttendance()" style="display: none;">
+                    <i class="fas fa-paper-plane"></i> Submit Attendance
+                </button>
+            </div>
+
+            <div id="history-view" class="view">
+                <h1>Attendance History</h1>
+                <div class="history-filters">
+                    <div class="control-group">
+                        <label>Subject</label>
+                        <select id="history-subject" onchange="loadHistory()">
+                            <option value="">All Subjects</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>From Date</label>
+                        <input type="date" id="history-from" onchange="loadHistory()">
+                    </div>
+                    <div class="control-group">
+                        <label>To Date</label>
+                        <input type="date" id="history-to" onchange="loadHistory()">
+                    </div>
+                </div>
+                <div id="history-table-container" class="table-container" style="display: none;">
+                    <table class="data-table history-table">
+                        <thead id="history-table-head">
+                        </thead>
+                        <tbody id="history-table-body">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="history-empty" class="empty-state">
+                    <i class="fas fa-history"></i>
+                    <h3>No Records Found</h3>
+                    <p>No attendance records match your filters</p>
+                </div>
+            </div>
+
+            <div id="export-view" class="view">
+                <h1>Monthly Attendance Register</h1>
+                <p class="export-description">Export attendance in monthly register format with all students and roll numbers</p>
+                <div id="export-data-status" class="data-status"></div>
+                <div class="export-controls">
+                    <div class="control-group">
+                        <label>Subject</label>
+                        <select id="export-subject">
+                            <option value="all">All Subjects</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>From Date</label>
+                        <input type="date" id="export-from">
+                    </div>
+                    <div class="control-group">
+                        <label>To Date</label>
+                        <input type="date" id="export-to">
+                    </div>
+                </div>
+                <div class="export-actions">
+                    <button class="btn btn-export" onclick="exportToExcel()">
+                        <i class="fas fa-file-excel"></i> Download Excel
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modal-title">Modal Title</h2>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body">
+            </div>
+            <div class="modal-footer" id="modal-footer">
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
